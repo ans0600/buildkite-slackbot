@@ -47,6 +47,6 @@ app.post("/", function (req, res) {
 
   console.log("buildkiteevent", buildkiteEvent);
   console.log("body", req.body);
-  res.write("ok");
+  res.status(204).end();
 });
 
