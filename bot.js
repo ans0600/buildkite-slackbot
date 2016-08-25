@@ -1,5 +1,6 @@
 const SlackBot = require("slackbots");
 const express = require("express");
+const path = require("path");
 const bodyParser = require("body-parser");
 
 const bot = new SlackBot({
@@ -29,8 +30,12 @@ bot.on("start", function () {
 
 
 const app = express();
-app.set("port", (process.env.PORT || 5000));
 app.use(bodyParser.json());
+
+var server = app.listen(process.env.PORT || 8080, function () {
+  var port = server.address().port;
+  console.log("App now running on port", port);
+});
 
 app.post("/", function (req, res) {
   console.log("Received POST", req.headers, req.webtaskContext.data);
@@ -44,5 +49,6 @@ app.post("/", function (req, res) {
 
   console.log("buildkiteevent", buildkiteEvent);
   console.log("body", req.body);
+  res.write("ok");
 });
 
