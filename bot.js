@@ -38,11 +38,9 @@ var server = app.listen(process.env.PORT || 8080, function () {
 });
 
 app.post("/", function (req, res) {
-  console.log("Received POST", req.headers, req.webtaskContext.data);
-  const webhookToken = req.webtaskContext.data.WEBHOOK_TOKEN;
+  console.log("Received POST", req.headers);
 
-  if (webhookToken && req.headers["x-buildkite-token"] != webhookToken)
-    return res.status(401).send("Invalid webhook token");
+  console.log("TOKEN", req.headers["x-buildkite-token"]);
 
   // Find the event name
   var buildkiteEvent = req.headers["x-buildkite-event"];
