@@ -30,10 +30,14 @@ var sendBuildStatusMessage = function (buildkiteEventType, webhookData) {
     const buildCreatorEmail = webhookData.build.creator.email;
     const branch = webhookData.build.branch;
     const buildState = webhookData.build.state;
-    // todo also notify build author
+    const buildUrl = webhookData.build.web_url;
+    // todo also notify commit author
     const slackUser = getSlackUserByBuildkiteUser(buildCreatorEmail);
     if (slackUser) {
       bot.postMessageToUser(slackUser, "Your build for `" + branch + "` has been updated with state: `" + buildState+ "`");
+      if (buildkiteEventType === "build.scheduled") {
+        bot.postMessageToUser(slackUser, buildUrl);
+      }
     } else {
       console.log("Unknown user", buildCreatorEmail, branch);
     }
