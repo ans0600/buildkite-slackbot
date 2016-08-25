@@ -3,9 +3,11 @@ const express = require("express");
 const bodyParser = require("body-parser");
 
 const bot = new SlackBot({
-  token: "xoxb-72869698775-NPC0xgEXlNuucElRdR5dzqem", // Add a bot https://my.slack.com/services/new/bot and put the token
-  name: "buildkite-bot"
+  token: process.env.SLACKBOT_TOKEN, // Add a bot https://my.slack.com/services/new/bot and put the token
+  name: process.env.SLACKBOT_NAME
 });
+
+const userMapping = JSON.parse(process.env.USER_MAPPING);
 
 bot.on("start", function () {
   console.log("slack bot is started");
@@ -20,18 +22,16 @@ var server = app.listen(process.env.PORT || 8080, function () {
 });
 
 var getSlackUserByBuildkiteUser = function (buildkiteUser) {
-  return {
-    "frank.an@rangeme.com": "frank"
-  }[buildkiteUser];
+  return userMapping[buildkiteUser];
 };
 
-var sendBuildStatusMessage =  function(buildkiteEventType, webhookData) {
+var sendBuildStatusMessage = function (buildkiteEventType, webhookData) {
   const buildCreatorEmail = webhookData.build.creator.email;
   const branch = webhookData.build.branch;
   // todo also notify build author
   const slackUser = getSlackUserByBuildkiteUser(buildCreatorEmail);
   if (slackUser) {
-    bot.postMessageToUser(slackUser, "Your build for" + branch + "has update with state: " + buildkiteEventType);
+    bot.postMessageToUser(slackUser, "Your build for " + branch + " has update with state: " + buildkiteEventType);
   } else {
     console.log("Unknown user", buildCreatorEmail, branch);
   }
