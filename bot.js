@@ -1,6 +1,5 @@
 const SlackBot = require("slackbots");
 const express = require("express");
-const path = require("path");
 const bodyParser = require("body-parser");
 
 const bot = new SlackBot({
@@ -9,25 +8,8 @@ const bot = new SlackBot({
 });
 
 bot.on("start", function () {
-  // more information about additional params https://api.slack.com/methods/chat.postMessage
-  var params = {
-    icon_emoji: ":cat:"
-  };
-
-  // // define channel, where bot exist. You can adjust it there https://my.slack.com/services
-  // bot.postMessageToChannel("general", "meow!", params);
-
-  // define existing username instead of "user_name"
-  bot.postMessageToUser("frank", "meow!", params);
-
-  // If you add a "slackbot" property, 
-  // you will post to another user"s slackbot channel instead of a direct message
-  // bot.postMessageToUser("frank", "meow!", { "slackbot": true, icon_emoji: ":cat:" });
-
-  // define private group instead of "private_group", where bot exist
-  // bot.postMessageToGroup("private_group", "meow!", params);
+  console.log("slack bot is started");
 });
-
 
 const app = express();
 app.use(bodyParser.json());
@@ -36,6 +18,24 @@ var server = app.listen(process.env.PORT || 8080, function () {
   var port = server.address().port;
   console.log("App now running on port", port);
 });
+
+var getSlackUserByBuildkiteUser = function (buildkiteUser) {
+  return {
+    "frank.an@rangeme.com": "frank"
+  }[buildkiteUser];
+};
+
+var sendBuildStatusMessage =  function(buildkiteEventType, webhookData) {
+  const buildCreatorEmail = webhookData.build.creator.email;
+  const branch = webhookData.build.branch;
+  // todo also notify build author
+  const slackUser = getSlackUserByBuildkiteUser(buildCreatorEmail);
+  if (slackUser) {
+    bot.postMessageToUser(slackUser, "Your build for" + branch + "has update with state: " + buildkiteEventType);
+  } else {
+    console.log("Unknown user", buildCreatorEmail, branch);
+  }
+};
 
 app.post("/", function (req, res) {
   console.log("Received POST", req.headers);
@@ -47,6 +47,7 @@ app.post("/", function (req, res) {
 
   console.log("buildkiteevent", buildkiteEvent);
   console.log("body", req.body);
+  sendBuildStatusMessage(buildkiteEvent, req.body);
   res.status(204).end();
 });
 
