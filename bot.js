@@ -33,7 +33,7 @@ var sendBuildStatusMessage = function (buildkiteEventType, webhookData) {
     // todo also notify build author
     const slackUser = getSlackUserByBuildkiteUser(buildCreatorEmail);
     if (slackUser) {
-      bot.postMessageToUser(slackUser, "Your build for " + branch + " has update with state: " + buildState);
+      bot.postMessageToUser(slackUser, "Your build for `" + branch + "` has been updated with state: `" + buildState+ "`");
     } else {
       console.log("Unknown user", buildCreatorEmail, branch);
     }
