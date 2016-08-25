@@ -26,20 +26,24 @@ var getSlackUserByBuildkiteUser = function (buildkiteUser) {
 };
 
 var sendBuildStatusMessage = function (buildkiteEventType, webhookData) {
-  const buildCreatorEmail = webhookData.build.creator.email;
-  const branch = webhookData.build.branch;
-  // todo also notify build author
-  const slackUser = getSlackUserByBuildkiteUser(buildCreatorEmail);
-  if (slackUser) {
-    bot.postMessageToUser(slackUser, "Your build for " + branch + " has update with state: " + buildkiteEventType);
-  } else {
-    console.log("Unknown user", buildCreatorEmail, branch);
+  if (buildkiteEventType.indexOf("build") >= 0) {
+    const buildCreatorEmail = webhookData.build.creator.email;
+    const branch = webhookData.build.branch;
+    const buildState = webhookData.build.state;
+    // todo also notify build author
+    const slackUser = getSlackUserByBuildkiteUser(buildCreatorEmail);
+    if (slackUser) {
+      bot.postMessageToUser(slackUser, "Your build for " + branch + " has update with state: " + buildState);
+    } else {
+      console.log("Unknown user", buildCreatorEmail, branch);
+    }
   }
 };
 
 app.post("/", function (req, res) {
   console.log("Received POST", req.headers);
 
+  // todo checking token for better security
   console.log("TOKEN", req.headers["x-buildkite-token"]);
 
   // Find the event name
@@ -50,4 +54,3 @@ app.post("/", function (req, res) {
   sendBuildStatusMessage(buildkiteEvent, req.body);
   res.status(204).end();
 });
-
