@@ -3,7 +3,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 
 const bot = new SlackBot({
-  token: process.env.SLACKBOT_TOKEN, // Add a bot https://my.slack.com/services/new/bot and put the token
+  token: process.env.SLACKBOT_TOKEN,
   name: process.env.SLACKBOT_NAME
 });
 
