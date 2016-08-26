@@ -34,7 +34,7 @@ var sendBuildStatusMessage = function (buildkiteEventType, webhookData) {
     // todo also notify commit author
     const slackUser = getSlackUserByBuildkiteUser(buildCreatorEmail);
     if (slackUser) {
-      bot.postMessageToUser(slackUser, "Your build for `" + branch + "` has been updated with state: `" + buildState+ "`");
+      bot.postMessageToUser(slackUser, "Your build for `" + branch + "` is now `" + buildState+ "`");
       if (buildkiteEventType === "build.scheduled") {
         bot.postMessageToUser(slackUser, buildUrl);
       }
